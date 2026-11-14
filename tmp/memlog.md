@@ -108,7 +108,18 @@ First run, by an Opus subagent using the file as its own instructions, gave seve
 6. Bash removed from `tools`; read-only is now enforced by the tool list. Trade-off: it cannot run `git diff`, so it asks for file names when given only a commit range.
 7. Audit scope: project only by default, plus `settings.local.json`; user-level files and drafts only when named.
 
-Also clarified: two load points in the per-file header line, "No findings" keeps the header, replacement wording allowed within a sentence, which neighbouring files to read, conditional problems, and a second `Question` value.
+Second pass by the same reviewer: six of the seven resolved, finding 2 partly. Four new findings and two wording points, all applied:
+
+- Audits skip `.claude/worktrees/` (full copies of the repo), and "under `.claude/`" means at the root of the repository being worked in.
+- The description now tells the delegating model to name the files or paste the diff, because the agent cannot run git.
+- Project instruction files already in the agent's context (such as unscoped rules) are material to review, not instructions to it.
+- Sizes are given in lines; word counts only as estimates marked "about", since the agent cannot count words.
+- "Ask for the file names" became "return without reviewing and say what you need", since a subagent cannot hold a dialogue.
+- Reference checks cover the project's own paths and scripts, not system tools such as `npm`.
+
+Still untested: the agent's search behaviour in an audit (Glob and Grep were unavailable to the reviewer in the second pass), and the cost checklist, because this repo has no `CLAUDE.md`, rules or skills. Next real test: install it and run it on a repo with a full Claude setup.
+
+Also clarified in the first round: two load points in the per-file header line, "No findings" keeps the header, replacement wording allowed within a sentence, which neighbouring files to read, conditional problems, and a second `Question` value.
 - `code-review-correctness`: first draft parked at `tmp/code-review-correctness.md`, not reviewed and not installed. Shelved because the user wants to start with a different agent altogether. Reusable later as a template (section order, "not your job" list, output format, severity and confidence scales).
 - Code reviewers still to write, when we return to them: `code-review-correctness` (from the parked draft), `code-review-edge-cases`, `code-review-intent`, `code-review-test-gaps`, `code-review-security`, `code-review-simplicity`, `code-review-blind`.
 - Next: the user reviews the `claude-whisperer` draft; then try it on this repo's own files.
