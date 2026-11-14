@@ -19,11 +19,22 @@ Restart Claude Code, or run `/agents`, to see them.
 | Option | Effect |
 |---|---|
 | `--copy` | Copy the files instead of symlinking them. Use this if you plan to delete the clone. |
-| `--force` | Replace an existing agent file that has the same name but did not come from this repository. Without it, such files are skipped with a warning. |
-| `--uninstall` | Remove the agents this repository installed. Files that did not come from it are left alone. |
+| `--force` | Replace an existing agent file that has the same name but was not installed by this script. Without it, such files are skipped with a warning. |
+| `--uninstall` | Remove the agents this script installed. Files it did not install are left alone. |
 | `--help` | Show usage. |
 
 The script needs bash and works on macOS and Linux. It is safe to run more than once.
+
+### What the script will and will not touch
+
+The script only replaces or removes files it installed. It keeps a small manifest, `.claude-agents-manifest`, in the agents directory to remember them: for each agent, either the link it made or a checksum of the copy it made.
+
+- A copy is still recognised after the agent changes upstream, so running `--copy` again updates it.
+- A copy you have edited is treated as yours. It is skipped, not overwritten or removed, unless you pass `--force`.
+- A symlink that points somewhere else is left alone, even when its target is missing.
+- If you move the clone, run the script again from the new location and it repairs its own links.
+
+The script exits with status 1 when it skipped anything, so you can tell a partial install from a complete one.
 
 ## Agents
 
@@ -43,6 +54,18 @@ Claude Code delegates to an agent on its own when a task matches the agent's des
 ```
 Use the claude-whisperer agent to audit this project's Claude setup.
 ```
+
+## Development
+
+The installer has a test suite that needs only bash:
+
+```sh
+tests/test_install.sh
+```
+
+Each test runs the installer against a throwaway copy of the repository layout and a throwaway config directory, so your real `~/.claude` is never touched. The run also reports line coverage of `scripts/install.sh` and fails below 80%. Set `COVERAGE_MIN` to change the threshold.
+
+The same tests run on Linux and macOS for every pull request.
 
 ## License
 

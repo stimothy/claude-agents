@@ -17,9 +17,10 @@ By default each agent is symlinked, so edits in this repository and
 
 Options:
   --copy        Copy the files instead of symlinking them.
-  --force       Replace existing files that did not come from this repository.
-  --uninstall   Remove the agents this repository installed. Files that did
-                not come from this repository are left alone.
+  --force       Replace existing files that this script did not install.
+  --uninstall   Remove the agents this script installed. Files it did not
+                install, or that were edited after a --copy install, are
+                left alone.
   -h, --help    Show this help.
 EOF
 }
@@ -51,6 +52,13 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 src_dir="$(cd "$script_dir/../agents" && pwd -P)"
 dest_dir="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/agents"
 
+# The manifest records what this script installed: one line per agent, holding
+# its file name, "link" or "copy", and the link target or the copy's checksum.
+# It lets the script recognise its own files after the source has changed or
+# the repository has moved, without mistaking anyone else's files for its own.
+manifest="$dest_dir/.claude-agents-manifest"
+tab="$(printf '\t')"
+
 shopt -s nullglob
 agents=("$src_dir"/*.md)
 shopt -u nullglob
@@ -65,59 +73,108 @@ exists() {
   [ -e "$1" ] || [ -L "$1" ]
 }
 
-# True if the destination is a symlink to the given source file.
-is_our_link() {
-  [ -L "$2" ] && [ "$(readlink "$2")" = "$1" ]
+checksum() {
+  cksum <"$1"
 }
 
-# True if the destination is a regular file identical to the source file.
-is_our_copy() {
-  [ -f "$2" ] && [ ! -L "$2" ] && cmp -s "$1" "$2"
+# Prints the manifest entry for a file name as "kind<TAB>value", or nothing.
+recorded() {
+  if [ -f "$manifest" ]; then
+    awk -F'\t' -v name="$1" '$1 == name { print $2 "\t" $3 }' "$manifest"
+  fi
 }
 
-# True if the destination is a symlink whose target no longer exists.
-is_dangling() {
-  [ -L "$1" ] && [ ! -e "$1" ]
+# Removes a file name from the manifest, and the manifest once it is empty.
+forget() {
+  if [ -f "$manifest" ]; then
+    awk -F'\t' -v name="$1" '$1 != name' "$manifest" >"$manifest.tmp"
+    mv "$manifest.tmp" "$manifest"
+    if [ ! -s "$manifest" ]; then
+      rm -f "$manifest"
+    fi
+  fi
+}
+
+# Records a file name in the manifest with its kind and value.
+record() {
+  forget "$1"
+  printf '%s\t%s\t%s\n' "$1" "$2" "$3" >>"$manifest"
+}
+
+# True if the destination is something this script installed and nobody has
+# changed since: a link to the source, a link the manifest recorded, a copy
+# identical to the source, or a copy whose checksum the manifest recorded.
+is_ours() {
+  local src="$1" dest="$2" name="$3" entry kind value target
+  entry="$(recorded "$name")"
+  kind="${entry%%"$tab"*}"
+  value="${entry#*"$tab"}"
+
+  if [ -L "$dest" ]; then
+    target="$(readlink "$dest")"
+    if [ "$target" = "$src" ]; then
+      return 0
+    fi
+    if [ "$kind" = "link" ] && [ "$target" = "$value" ]; then
+      return 0
+    fi
+    return 1
+  fi
+
+  if [ -f "$dest" ]; then
+    if cmp -s "$src" "$dest"; then
+      return 0
+    fi
+    if [ "$kind" = "copy" ] && [ "$(checksum "$dest")" = "$value" ]; then
+      return 0
+    fi
+  fi
+  return 1
 }
 
 done_count=0
 skipped_count=0
+
+skip() {
+  echo "  skipped  $1 ($2)" >&2
+  skipped_count=$((skipped_count + 1))
+}
 
 install_agent() {
   local src="$1" name dest
   name="$(basename "$src")"
   dest="$dest_dir/$name"
 
-  if [ "$mode" = "link" ] && is_our_link "$src" "$dest"; then
+  if [ "$mode" = "link" ] && [ -L "$dest" ] && [ "$(readlink "$dest")" = "$src" ]; then
+    record "$name" link "$src"
     echo "  ok       $name (already linked)"
-    return
+    return 0
   fi
-  if [ "$mode" = "copy" ] && is_our_copy "$src" "$dest"; then
+  if [ "$mode" = "copy" ] && [ -f "$dest" ] && [ ! -L "$dest" ] && cmp -s "$src" "$dest"; then
+    record "$name" copy "$(checksum "$dest")"
     echo "  ok       $name (already up to date)"
-    return
+    return 0
   fi
 
   if exists "$dest"; then
-    if is_our_link "$src" "$dest" || is_our_copy "$src" "$dest" || is_dangling "$dest"; then
-      rm -f "$dest"
-    elif [ -d "$dest" ] && [ ! -L "$dest" ]; then
-      echo "  skipped  $name (a directory with that name exists)" >&2
-      skipped_count=$((skipped_count + 1))
-      return
-    elif [ "$force" -eq 1 ]; then
-      rm -f "$dest"
-    else
-      echo "  skipped  $name (a different file exists; use --force to replace it)" >&2
-      skipped_count=$((skipped_count + 1))
-      return
+    if [ -d "$dest" ] && [ ! -L "$dest" ]; then
+      skip "$name" "a directory with that name exists"
+      return 0
     fi
+    if [ "$force" -eq 0 ] && ! is_ours "$src" "$dest" "$name"; then
+      skip "$name" "a file this script did not install exists; use --force to replace it"
+      return 0
+    fi
+    rm -f "$dest"
   fi
 
   if [ "$mode" = "link" ]; then
     ln -s "$src" "$dest"
+    record "$name" link "$src"
     echo "  linked   $name"
   else
     cp "$src" "$dest"
+    record "$name" copy "$(checksum "$dest")"
     echo "  copied   $name"
   fi
   done_count=$((done_count + 1))
@@ -129,15 +186,16 @@ uninstall_agent() {
   dest="$dest_dir/$name"
 
   if ! exists "$dest"; then
-    return
+    forget "$name"
+    return 0
   fi
-  if is_our_link "$src" "$dest" || is_our_copy "$src" "$dest"; then
+  if is_ours "$src" "$dest" "$name"; then
     rm -f "$dest"
+    forget "$name"
     echo "  removed  $name"
     done_count=$((done_count + 1))
   else
-    echo "  skipped  $name (not installed from this repository)" >&2
-    skipped_count=$((skipped_count + 1))
+    skip "$name" "not installed by this script, or changed since"
   fi
 }
 

@@ -7,13 +7,26 @@ Working notes carried between sessions. Not part of the published agent set.
 - Agent definitions live in `agents/`, one `<name>.md` per agent.
 - Installer lives at `scripts/install.sh`.
   - Symlinks into `~/.claude/agents/` by default; `--copy` to copy instead.
-  - `--uninstall` removes only the symlinks it created.
+  - `--uninstall` removes only what it installed.
   - On a same-named file that isn't ours: skip and warn; `--force` overrides.
+  - Ownership is tracked in a manifest (see "Installer changes after PR review").
   - Idempotent; creates `~/.claude/agents/` if missing.
   - macOS and Linux (bash) only. User-level install only.
 - Public repo: MIT license, README written for strangers, nothing personal in any file.
 - Filenames are kebab-case and match the agent's `name` field.
 - Scaffolding (script, README, license) gets written alongside the first agent.
+
+## Installer changes after PR review (2026-11-14)
+
+PR #1 got two automated review comments (Codex), both on `scripts/install.sh`, both fixed:
+
+- A `--copy` install lost its identity once the source changed, because ownership was judged by comparing against the current source. The script now keeps a manifest, `.claude-agents-manifest`, in the agents directory: file name, `link` or `copy`, and the link target or the copy's checksum (`cksum`).
+- A dangling symlink was replaced without `--force` even when it belonged to another installation. Dangling links are now protected like any other file; the script's own dangling links (after the repository moves) are recognised through the manifest.
+- A copy the user has edited no longer matches its recorded checksum, so it is treated as theirs: skipped on install, left on uninstall.
+
+Tests: `tests/test_install.sh`, plain bash with no dependencies (bats and kcov are not installed locally). 32 tests. Coverage is line coverage measured from `bash -x` output, with executable lines picked out by an awk heuristic; the run fails below `COVERAGE_MIN` (default 80). CI in `.github/workflows/test.yml` runs it on Linux and macOS.
+
+Known gap, not fixed: when an agent is renamed or removed in the repository, its old link stays in the agents directory. The manifest would allow pruning these.
 
 ## Review agent conventions (settled)
 
