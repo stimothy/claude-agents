@@ -36,7 +36,7 @@ Work out where the text should live before you write it. Pick the place that loa
 | To files of one kind or in one area | `.claude/rules/<topic>.md` with `paths` in the frontmatter | When Claude works with matching files |
 | To a task done now and then, with steps to follow | A skill: `.claude/skills/<name>/SKILL.md` | The description every session, the body when the skill is used |
 | To work that should run in its own context, with its own tools or model | An agent: `.claude/agents/<name>.md` | The description every session, the body when the agent runs |
-| Every single time, or never, with no judgement involved | A hook or a permission rule in settings | Never loads as text. The harness enforces it |
+| Every single time, or never, with no judgement involved | A hook or a permission rule in settings | Not as instructions. The harness enforces it. Anything a hook prints into context costs as `CLAUDE.md` does |
 
 Things that follow from this:
 
@@ -50,7 +50,7 @@ Things that follow from this:
 Read the file you are changing in full, and the files that can be in context at the same time: the root `CLAUDE.md`, rules that are not scoped to paths, and the descriptions of sibling agents and skills.
 
 - If the instruction already exists somewhere, change it there. Do not add a second copy.
-- If your text would contradict something already written, resolve it. Change the older text when the task makes clear which should win. Otherwise leave both alone and report the conflict.
+- If your text would contradict something already written, resolve it. Change the older text when the task makes clear which should win. Otherwise do not write the conflicting text. Report the conflict and what you would have written.
 - Make the smallest change that does the job. Keep the file's structure, voice and existing instructions. Other people's instructions are there for reasons you cannot see, so do not rewrite or delete them unless you were asked to, and say so in your report when you think something should go.
 - When you were asked to tighten or cut a file, apply the deletion test line by line, and list what you removed.
 
@@ -65,16 +65,16 @@ Read each sentence as the model that will receive it.
 - Use the names that appear in the code. Define a project term the first time you use it, or do without it.
 - Describe the behaviour instead of giving one example of it. Agents copy an example closely. If examples are needed, give several that differ from each other.
 - Put the instruction before its background, and what matters most first.
-- Leave out what Claude does anyway and what it can find by looking: good practice in general, how common tools work, the directory layout, the dependency list. Where the detail lives in another file, point to the file instead of copying it.
+- Leave out what Claude does anyway and what it can find by looking: good practice in general, how common tools work, the directory layout, the dependency list. Where the detail lives in another file, point to the file instead of copying it. In `CLAUDE.md`, give a plain path the agent can read when it needs it. An `@path` import loads the whole file every session.
 - Mention only paths, scripts and commands that exist. Check each one by finding the file or its definition. If the file you are writing will be installed into other projects, refer only to files that ship with it, and write about the installing project in general terms.
 
 Short is not the aim. A file too thin to instruct fails the second test. Write what the reader needs and stop.
 
 ## What each kind of file needs
 
-Claude Code ignores frontmatter keys it does not recognise and reports nothing, so a misspelt key silently does nothing. Check the spelling of every key you write. The keys named below are the common ones, not the full set. Leave keys that are already in a file as they are, and list in your report any key you wrote that is not named here, so the user can confirm it.
+Claude Code ignores frontmatter keys it does not recognise and reports nothing, so a misspelt key silently does nothing. Check the spelling of every key you write. The keys named below are the common ones, not the full set. Leave keys that are already in a file as they are, and list in your report any key you wrote that is not named here, so the user can confirm it. If an existing key looks like a misspelling, or is written in the other kind's style, leave it and name it in your report.
 
-**Agent.** The opening `---` must be the first line, and `name` and `description` are required. The keys are camelCase, for example `tools`, `disallowedTools`, `model`, `effort` and `omitClaudeMd`.
+**Agent.** The opening `---` must be the first line, and `name` and `description` are required. The frontmatter must be valid YAML, or the agent is skipped without warning, so quote a description that contains a colon followed by a space. The keys are camelCase, for example `tools`, `disallowedTools`, `model`, `effort` and `omitClaudeMd`.
 
 - The description is read by the delegating model in every session. Say when to use the agent and what the caller must hand over. Say also when not to use it, so that a model can choose correctly between it and the sibling descriptions you read. Keep it short.
 - The body is the agent's system prompt. The agent sees none of the conversation that led to it, so brief it fully: what it is for, how to work, what to leave alone, and what to return.
