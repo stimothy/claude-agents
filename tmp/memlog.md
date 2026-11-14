@@ -18,7 +18,7 @@ Working notes carried between sessions. Not part of the published agent set.
 ## Review agent conventions (settled)
 
 - Separate roster per project type, not one generalized set.
-- Names are prefixed by domain so they sort together.
+- Naming: the user wants playful names, and chose `claude-whisperer` for the first agent. Delegation runs on the `description`, so the name is free to have character. The plain domain-prefixed names listed below (`code-review-*` and so on) are placeholders to be renamed in the same spirit; no naming pattern for the whole collection has been chosen yet.
 - All reviewers are read-only.
 - Every agent has an explicit "not your job" section to prevent duplicate findings.
 - Shared output format: location, severity, concrete description of the problem, confidence.
@@ -56,7 +56,7 @@ Proposed prefix: `story-review-`.
 ## Status
 
 - Scaffolding written: `scripts/install.sh`, `README.md`, `LICENSE`. Installer tested against a throwaway config directory and is shellcheck-clean.
-- `claude-config-review`: first draft at `agents/claude-config-review.md`, awaiting the user's review. Not yet run on real files.
+- `claude-whisperer` (first called `claude-config-review`): first draft at `agents/claude-whisperer.md`, awaiting the user's review. Not yet run on real files.
   - Purpose: review the files that instruct Claude (`CLAUDE.md`, `AGENTS.md`, `.claude/rules`, skills, agents, commands, hooks). Built first so it can review every other agent written in this repo.
   - Three questions per file: fit for purpose; understood and followed (added by the user); worth its context cost.
   - Backbone is a table of when each kind of file loads, since cost depends on load frequency.
@@ -64,6 +64,6 @@ Proposed prefix: `story-review-`.
   - This replaces the draft "prompt and config review roster" below as the starting point for that domain.
 - `code-review-correctness`: first draft parked at `tmp/code-review-correctness.md`, not reviewed and not installed. Shelved because the user wants to start with a different agent altogether. Reusable later as a template (section order, "not your job" list, output format, severity and confidence scales).
 - Code reviewers still to write, when we return to them: `code-review-correctness` (from the parked draft), `code-review-edge-cases`, `code-review-intent`, `code-review-test-gaps`, `code-review-security`, `code-review-simplicity`, `code-review-blind`.
-- Next: the user reviews the `claude-config-review` draft; then try it on this repo's own files.
+- Next: the user reviews the `claude-whisperer` draft; then try it on this repo's own files.
 - When adding an agent: add a row to the README table, and check the "not your job" lists of the existing agents still point at the right names.
 - Open question: whether `tmp/memlog.md` gets pushed to the public repo or stays local.

@@ -1,5 +1,5 @@
 ---
-name: claude-config-review
+name: claude-whisperer
 description: Reviews the files that instruct Claude in a project - CLAUDE.md, AGENTS.md, .claude/rules, skills, agent definitions, commands and hooks - and judges whether each one fits its purpose, will be understood and followed, and is worth the context it costs. Use after writing or changing any of these files, or to audit a project's whole Claude setup. Read-only - it reports findings and never edits files.
 tools: Read, Grep, Glob, Bash
 ---

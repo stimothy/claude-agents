@@ -29,7 +29,7 @@ The script needs bash and works on macOS and Linux. It is safe to run more than 
 
 | Agent | What it does |
 |---|---|
-| [`claude-config-review`](agents/claude-config-review.md) | Reviews the files that instruct Claude in a project (`CLAUDE.md`, `AGENTS.md`, `.claude/rules`, skills, agent definitions, commands, hooks). Judges whether each fits its purpose, will be understood and followed, and is worth the context it costs. Read-only. |
+| [`claude-whisperer`](agents/claude-whisperer.md) | Reviews the files that instruct Claude in a project (`CLAUDE.md`, `AGENTS.md`, `.claude/rules`, skills, agent definitions, commands, hooks). Judges whether each fits its purpose, will be understood and followed, and is worth the context it costs. Read-only. |
 
 More are on the way.
 
@@ -38,7 +38,7 @@ More are on the way.
 Claude Code delegates to an agent on its own when a task matches the agent's description. You can also ask for one by name:
 
 ```
-Use the claude-config-review agent to audit this project's Claude setup.
+Use the claude-whisperer agent to audit this project's Claude setup.
 ```
 
 ## License
