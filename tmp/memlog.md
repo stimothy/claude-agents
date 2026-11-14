@@ -62,6 +62,24 @@ Proposed prefix: `story-review-`.
   - Backbone is a table of when each kind of file loads, since cost depends on load frequency.
   - Settled: one agent, not several; reviews diffs but always reads whole files; audits the whole setup when nothing is named; recognises files by content as well as path (this repo keeps agents in `agents/`); checks across files for duplication and contradiction; read-only, no web access.
   - This replaces the draft "prompt and config review roster" below as the starting point for that domain.
+  - Runs on `model: opus`, `effort: high`: judgment-heavy, runs rarely on small inputs, and a wrong "cut this" is costly. Alias used instead of a full model ID so it tracks the current Opus.
+
+## Agent file format (checked against the docs on 2026-11-13)
+
+Source: https://code.claude.com/docs/en/sub-agents and https://code.claude.com/docs/en/model-config
+
+- Required keys: `name`, `description`. Keys are camelCase and must match exactly.
+- `effort` is a real key: `low`, `medium`, `high`, `xhigh`, `max` (levels depend on the model). Omitted, the agent uses the session's effort level. `CLAUDE_CODE_EFFORT_LEVEL` overrides it.
+- `model`: `sonnet`, `opus`, `haiku`, `fable`, a full model ID, or `inherit`. Omitted, it uses the main conversation's model.
+- `tools`: comma-separated string or YAML list. Omitted, the agent inherits every tool. `disallowedTools` removes tools and is applied first.
+- Unrecognised keys are ignored with no error. `claude --debug` logs them ("does not recognize or apply").
+- A file is skipped silently if `---` is not its first line or `name` is missing; skipped with a logged reason if `description` is missing or the YAML is invalid.
+- The filename does not have to match `name`. Matching them is this repo's own convention.
+- `name`: at most 256 characters, no `:`, cannot start with `-`.
+- Agents load the project's `CLAUDE.md` files unless `omitClaudeMd: true`.
+- Descriptions should be short: they sit in context every session.
+- Other keys: `permissionMode`, `maxTurns`, `autoCompactWindow`, `skills`, `mcpServers`, `hooks`, `memory`, `background`, `isolation`, `color`, `initialPrompt`, `experimental`.
+- `claude plugin validate <dir>` checks an agents directory for unparseable frontmatter.
 - `code-review-correctness`: first draft parked at `tmp/code-review-correctness.md`, not reviewed and not installed. Shelved because the user wants to start with a different agent altogether. Reusable later as a template (section order, "not your job" list, output format, severity and confidence scales).
 - Code reviewers still to write, when we return to them: `code-review-correctness` (from the parked draft), `code-review-edge-cases`, `code-review-intent`, `code-review-test-gaps`, `code-review-security`, `code-review-simplicity`, `code-review-blind`.
 - Next: the user reviews the `claude-whisperer` draft; then try it on this repo's own files.
