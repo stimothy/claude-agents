@@ -56,9 +56,14 @@ Proposed prefix: `story-review-`.
 ## Status
 
 - Scaffolding written: `scripts/install.sh`, `README.md`, `LICENSE`. Installer tested against a throwaway config directory and is shellcheck-clean.
-- `agents/` is empty (holds only `.gitkeep`). The installer reports "No agent files found" until an agent is added.
+- `claude-config-review`: first draft at `agents/claude-config-review.md`, awaiting the user's review. Not yet run on real files.
+  - Purpose: review the files that instruct Claude (`CLAUDE.md`, `AGENTS.md`, `.claude/rules`, skills, agents, commands, hooks). Built first so it can review every other agent written in this repo.
+  - Three questions per file: fit for purpose; understood and followed (added by the user); worth its context cost.
+  - Backbone is a table of when each kind of file loads, since cost depends on load frequency.
+  - Settled: one agent, not several; reviews diffs but always reads whole files; audits the whole setup when nothing is named; recognises files by content as well as path (this repo keeps agents in `agents/`); checks across files for duplication and contradiction; read-only, no web access.
+  - This replaces the draft "prompt and config review roster" below as the starting point for that domain.
 - `code-review-correctness`: first draft parked at `tmp/code-review-correctness.md`, not reviewed and not installed. Shelved because the user wants to start with a different agent altogether. Reusable later as a template (section order, "not your job" list, output format, severity and confidence scales).
 - Code reviewers still to write, when we return to them: `code-review-correctness` (from the parked draft), `code-review-edge-cases`, `code-review-intent`, `code-review-test-gaps`, `code-review-security`, `code-review-simplicity`, `code-review-blind`.
-- Next: the user will describe a separate agent to start with.
+- Next: the user reviews the `claude-config-review` draft; then try it on this repo's own files.
 - When adding an agent: add a row to the README table, and check the "not your job" lists of the existing agents still point at the right names.
 - Open question: whether `tmp/memlog.md` gets pushed to the public repo or stays local.
