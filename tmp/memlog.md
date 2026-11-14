@@ -18,7 +18,7 @@ Working notes carried between sessions. Not part of the published agent set.
 ## Review agent conventions (settled)
 
 - Separate roster per project type, not one generalized set.
-- Naming: the user wants playful names, and chose `claude-whisperer` for the first agent. Delegation runs on the `description`, so the name is free to have character. The plain domain-prefixed names listed below (`code-review-*` and so on) are placeholders to be renamed in the same spirit; no naming pattern for the whole collection has been chosen yet.
+- Naming: the user wants playful names, and chose `claude-whisperer` for the first agent and `claude-wordsmith` for its writing partner. Delegation runs on the `description`, so the name is free to have character. The plain domain-prefixed names listed below (`code-review-*` and so on) are placeholders to be renamed in the same spirit; no naming pattern for the whole collection has been chosen yet.
 - All reviewers are read-only.
 - Every agent has an explicit "not your job" section to prevent duplicate findings.
 - Shared output format: location, severity, concrete description of the problem, confidence.
@@ -64,7 +64,7 @@ Proposed prefix: `story-review-`.
   - This replaces the draft "prompt and config review roster" below as the starting point for that domain.
   - Runs on `model: opus`, `effort: high`: judgment-heavy, runs rarely on small inputs, and a wrong "cut this" is costly. Alias used instead of a full model ID so it tracks the current Opus.
 
-- `claude-scribe`: at `agents/claude-scribe.md`. Not yet run for real. The name is my proposal; the user has not objected to it.
+- `claude-wordsmith` (first called `claude-scribe`; the user chose the name): at `agents/claude-wordsmith.md`. Not yet run for real.
   - Purpose: the writing counterpart to `claude-whisperer`. Creates and edits the same files, with the same three tests turned into rules for writing.
   - Tools: Read, Grep, Glob, Edit, Write. No Bash. `model: opus`, `effort: high`.
   - Sets `omitClaudeMd: true`, like the reviewer. (First draft left it off so the agent would follow project conventions; the review pointed out it reads the root `CLAUDE.md` itself anyway, so the default load paid for it twice and went stale after an edit.)

@@ -1,5 +1,5 @@
 ---
-name: claude-scribe
+name: claude-wordsmith
 description: Writes and edits the files that instruct Claude in a project - CLAUDE.md, AGENTS.md, .claude/rules, skills, agent definitions and commands. Use to create one of these files or to add, change or tighten instructions in one. Tell it the behaviour you want from Claude and why, and name any file it should change.
 tools: Read, Grep, Glob, Edit, Write
 model: opus
