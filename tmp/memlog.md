@@ -60,7 +60,7 @@ Proposed prefix: `story-review-`.
   - Purpose: review the files that instruct Claude (`CLAUDE.md`, `AGENTS.md`, `.claude/rules`, skills, agents, commands, hooks). Built first so it can review every other agent written in this repo.
   - Three questions per file: fit for purpose; understood and followed (added by the user); worth its context cost.
   - Backbone is a table of when each kind of file loads, since cost depends on load frequency.
-  - Settled: one agent, not several; reviews diffs but always reads whole files; audits the whole setup when nothing is named; recognises files by content as well as path (this repo keeps agents in `agents/`); checks across files for duplication and contradiction; read-only, no web access.
+  - Settled: one agent, not several; reviews named files or a pasted diff but always reads whole files; audits the whole setup when nothing is named; recognises files by content as well as path (this repo keeps agents in `agents/`); checks across files for duplication and contradiction; read-only (tools are Read, Grep, Glob), no web access.
   - This replaces the draft "prompt and config review roster" below as the starting point for that domain.
   - Runs on `model: opus`, `effort: high`: judgment-heavy, runs rarely on small inputs, and a wrong "cut this" is costly. Alias used instead of a full model ID so it tracks the current Opus.
 
@@ -80,6 +80,35 @@ Source: https://code.claude.com/docs/en/sub-agents and https://code.claude.com/d
 - Descriptions should be short: they sit in context every session.
 - Other keys: `permissionMode`, `maxTurns`, `autoCompactWindow`, `skills`, `mcpServers`, `hooks`, `memory`, `background`, `isolation`, `color`, `initialPrompt`, `experimental`.
 - `claude plugin validate <dir>` checks an agents directory for unparseable frontmatter.
+- `omitClaudeMd: true` drops the user, project and local `CLAUDE.md` files from the agent's starting context. The docs do not say whether unscoped rules are dropped too. By default a custom agent gets `CLAUDE.md` files and project rules.
+- An agent's `hooks` key can define a PreToolUse hook.
+
+## Other file formats (checked against the docs on 2026-11-13)
+
+Sources: https://code.claude.com/docs/en/skills, /slash-commands, /memory, /hooks, /settings
+
+- Commands (`.claude/commands/*.md`) have been merged into skills and work the same way. They take the skill keys except `name` and `paths`. That their descriptions load every session is inferred from "work the same way", not stated.
+- Skills: every key is optional; only `description` is recommended. Keys are hyphenated (`disable-model-invocation`, `allowed-tools`, `user-invocable`), except `when_to_use`. Agent keys are camelCase.
+- Skill descriptions load every session; the body loads when invoked. `disable-model-invocation: true` keeps the description out of context.
+- Skill `name` defaults to the directory name and need not match it.
+- Unrecognised keys are ignored silently in skills, commands and rules. A skill with unparseable YAML still loads, with no fields set.
+- Rules read one key, `paths` (YAML list or comma-separated string). Without it, or with broken YAML, the rule loads every session. User-level rules live in `~/.claude/rules/`.
+- Hooks: plain stdout becomes context for `SessionStart`, `UserPromptSubmit`, `UserPromptExpansion` and `PostModelSwitch`. `additionalContext` adds context for those and for the tool-use, stop and subagent events. The checker read only the first third of the hooks page.
+- `.claude/settings.local.json` holds personal, untracked settings; Claude Code writes permission approvals there.
+
+## Self-review of `claude-whisperer` (2026-11-13)
+
+First run, by an Opus subagent using the file as its own instructions, gave seven findings, all applied:
+
+1. Reference checks now depend on where a file takes effect: here (check everything), elsewhere after install (check only what ships with it), unclear (check, report at low confidence). The user's requirement: someone who installs the agent and reviews a skill in their own repo still gets every reference checked.
+2. `omitClaudeMd: true` set, so it does not take the project's `CLAUDE.md` as instructions while reviewing it.
+3. Commands row corrected.
+4. Hooks can cost context when they print into it.
+5. Silent frontmatter failures now cover rules and skills as well as agents.
+6. Bash removed from `tools`; read-only is now enforced by the tool list. Trade-off: it cannot run `git diff`, so it asks for file names when given only a commit range.
+7. Audit scope: project only by default, plus `settings.local.json`; user-level files and drafts only when named.
+
+Also clarified: two load points in the per-file header line, "No findings" keeps the header, replacement wording allowed within a sentence, which neighbouring files to read, conditional problems, and a second `Question` value.
 - `code-review-correctness`: first draft parked at `tmp/code-review-correctness.md`, not reviewed and not installed. Shelved because the user wants to start with a different agent altogether. Reusable later as a template (section order, "not your job" list, output format, severity and confidence scales).
 - Code reviewers still to write, when we return to them: `code-review-correctness` (from the parked draft), `code-review-edge-cases`, `code-review-intent`, `code-review-test-gaps`, `code-review-security`, `code-review-simplicity`, `code-review-blind`.
 - Next: the user reviews the `claude-whisperer` draft; then try it on this repo's own files.
