@@ -30,6 +30,9 @@ The script needs bash and works on macOS and Linux. It is safe to run more than 
 | Agent | What it does |
 |---|---|
 | [`claude-whisperer`](agents/claude-whisperer.md) | Reviews the files that instruct Claude in a project (`CLAUDE.md`, `AGENTS.md`, `.claude/rules`, skills, agent definitions, commands, hooks). Judges whether each fits its purpose, will be understood and followed, and is worth the context it costs. Read-only. |
+| [`claude-scribe`](agents/claude-scribe.md) | Writes and edits those same files. Works out which kind of file an instruction belongs in, writes it so the agent reading it will follow it, and keeps it to what is worth its context. |
+
+The two are a pair: `claude-scribe` writes, `claude-whisperer` reviews.
 
 More are on the way.
 

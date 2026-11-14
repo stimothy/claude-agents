@@ -64,6 +64,15 @@ Proposed prefix: `story-review-`.
   - This replaces the draft "prompt and config review roster" below as the starting point for that domain.
   - Runs on `model: opus`, `effort: high`: judgment-heavy, runs rarely on small inputs, and a wrong "cut this" is costly. Alias used instead of a full model ID so it tracks the current Opus.
 
+- `claude-scribe`: first draft at `agents/claude-scribe.md`, awaiting the user's review. Not yet run and not yet reviewed by `claude-whisperer`. The name is my proposal; the user has not confirmed it.
+  - Purpose: the writing counterpart to `claude-whisperer`. Creates and edits the same files, with the same three tests turned into rules for writing.
+  - Tools: Read, Grep, Glob, Edit, Write. No Bash. `model: opus`, `effort: high`.
+  - Does not set `omitClaudeMd`: it does work in the project and should follow the project's conventions. (The reviewer does set it.)
+  - Never edits settings files. It describes hooks and permission rules in its report for the user to add, because hooks run commands.
+  - Returns without writing when the brief does not say what behaviour is wanted, why, and when it applies.
+  - Makes the smallest change; does not rewrite or delete existing instructions unless asked.
+  - Open design point: the two agents each carry their own copy of the loading rules and frontmatter facts, so the copies can drift. A shared skill preloaded through the `skills` key would remove the duplication, but the installer only handles agents today.
+
 ## Agent file format (checked against the docs on 2026-11-13)
 
 Source: https://code.claude.com/docs/en/sub-agents and https://code.claude.com/docs/en/model-config
@@ -122,6 +131,7 @@ Still untested: the agent's search behaviour in an audit (Glob and Grep were una
 Also clarified in the first round: two load points in the per-file header line, "No findings" keeps the header, replacement wording allowed within a sentence, which neighbouring files to read, conditional problems, and a second `Question` value.
 - `code-review-correctness`: first draft parked at `tmp/code-review-correctness.md`, not reviewed and not installed. Shelved because the user wants to start with a different agent altogether. Reusable later as a template (section order, "not your job" list, output format, severity and confidence scales).
 - Code reviewers still to write, when we return to them: `code-review-correctness` (from the parked draft), `code-review-edge-cases`, `code-review-intent`, `code-review-test-gaps`, `code-review-security`, `code-review-simplicity`, `code-review-blind`.
-- Next: the user reviews the `claude-whisperer` draft; then try it on this repo's own files.
+- `claude-whisperer` has been through two self-review rounds (see below). The user wants both agents in before merging the branch.
+- Next: the user reviews the `claude-scribe` draft; have `claude-whisperer` review it; then merge, install, and try both on a repo with a real Claude setup.
 - When adding an agent: add a row to the README table, and check the "not your job" lists of the existing agents still point at the right names.
 - Open question: whether `tmp/memlog.md` gets pushed to the public repo or stays local.
