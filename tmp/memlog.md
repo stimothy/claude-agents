@@ -55,5 +55,8 @@ Proposed prefix: `story-review-`.
 
 ## Status
 
-- No agent files written yet.
-- Next: confirm the code roster names, then define the agents one at a time.
+- Scaffolding written: `scripts/install.sh`, `README.md`, `LICENSE`. Installer tested against a throwaway config directory and is shellcheck-clean.
+- `code-review-correctness`: first draft written, awaiting review. It is the template for the others (section order, "not your job" list, output format, severity and confidence scales).
+- Remaining code reviewers, in suggested order: `code-review-edge-cases`, `code-review-intent`, `code-review-test-gaps`, `code-review-security`, `code-review-simplicity`, `code-review-blind`.
+- When adding an agent: add a row to the README table, and check the "not your job" lists of the existing agents still point at the right names.
+- Open question: whether `tmp/memlog.md` gets pushed to the public repo or stays local.
