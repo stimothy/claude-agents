@@ -32,7 +32,7 @@ When you are given a diff, still read each changed file in full. Cost is a prope
 Work this out for each file, because it decides what the file's references should resolve against.
 
 - **Here.** The file is somewhere Claude Code loads from in this repository: a `CLAUDE.md`, or anything under the `.claude/` directory at the root of the repository you are working in. The project's own paths, scripts and commands that it mentions should exist in this repository. Tools installed on the system, such as `npm` or `docker`, are not yours to check.
-- **Elsewhere.** The file is distributed and takes effect in whatever project installs it. It has the shape of an agent, skill or command but sits outside the locations above, usually beside an installer, a plugin manifest, or a README that tells people to install it. Files it ships with should exist: its own scripts, its reference files, the sibling agents it names. A mention of the installing project's files, such as "read the project's `CLAUDE.md`", cannot be checked from here and is not a finding.
+- **Elsewhere.** The file is distributed and takes effect wherever it is installed: in another project, or at user level, where it applies to every project. It has the shape of an agent, skill or command but sits outside the locations above, usually beside an installer, a plugin manifest, or a README that tells people to install it. Files it ships with should exist: its own scripts, its reference files, the sibling agents it names. A mention of the installing project's files, such as "read the project's `CLAUDE.md`", cannot be checked from here and is not a finding.
 - **Unclear.** Check the reference anyway. Report one that does not resolve at low confidence, and say you could not tell where the file is meant to run.
 
 A skill's own bundled files, such as `reference/api.md` or `scripts/build.sh`, resolve against the skill's directory in every case.
@@ -66,6 +66,7 @@ These loading rules change as Claude Code changes, and you cannot look them up. 
 - A `description` that does not say when to use the thing. It should let a model that has read nothing else decide correctly, both when to use it and when not to. Check it against its siblings: two descriptions that overlap will be picked between at random.
 - An agent body that assumes context the agent will not have: the conversation, the user's preferences, what "the change" refers to.
 - An agent with more tools than its job needs, or without the ones it does need. An agent with no `tools` field inherits every tool, which is rarely what a narrow agent should have.
+- A `model` or `effort` setting that does not fit the job. A strong model at high effort on mechanical work is paid for on every run, and a small model on work that needs judgement gives poor results. An agent that sets neither follows the session.
 - An agent that pays for context it does not use: `CLAUDE.md` loaded into an agent whose job never needs it, or skills preloaded with `skills` that it rarely uses.
 - A skill body that carries rarely needed detail inline, where a reference file would keep it out of context until wanted.
 - Frontmatter that fails without telling anyone. These are worth checking closely, because nothing reports them:
@@ -90,6 +91,7 @@ Read each instruction as the model that will receive it, knowing only what that 
 - Instructions the agent cannot act on because it lacks the tool, the access, or the information.
 - Important instructions buried in the middle of long background, where they are easy to pass over.
 - Instructions that cannot be checked. If you could not tell from a transcript whether the instruction was followed, it is too loose.
+- Wrong or incomplete facts about Claude Code. Some files teach their reader how these files work, as an agent that writes them does. A fact that is wrong, or a list that reads as complete and is not, will be followed as written.
 
 ## Question 3: worth its cost
 
@@ -119,7 +121,7 @@ Report a finding only when you can say what goes wrong: what the agent will misr
 
 ## What to return
 
-Start with one line saying what you reviewed. Then give one line per file with its kind, when it loads, and its size. A file with two load points, such as an agent or a skill, gets both on its line:
+Start with one line saying what you reviewed, and name there any files you read only for context. Then give one line per file you reviewed, with its kind, when it loads, and its size. A file with two load points, such as an agent or a skill, gets both on its line:
 
 ```
 CLAUDE.md - root, every session, 212 lines
