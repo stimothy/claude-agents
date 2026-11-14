@@ -56,7 +56,9 @@ Proposed prefix: `story-review-`.
 ## Status
 
 - Scaffolding written: `scripts/install.sh`, `README.md`, `LICENSE`. Installer tested against a throwaway config directory and is shellcheck-clean.
-- `code-review-correctness`: first draft written, awaiting review. It is the template for the others (section order, "not your job" list, output format, severity and confidence scales).
-- Remaining code reviewers, in suggested order: `code-review-edge-cases`, `code-review-intent`, `code-review-test-gaps`, `code-review-security`, `code-review-simplicity`, `code-review-blind`.
+- `agents/` is empty (holds only `.gitkeep`). The installer reports "No agent files found" until an agent is added.
+- `code-review-correctness`: first draft parked at `tmp/code-review-correctness.md`, not reviewed and not installed. Shelved because the user wants to start with a different agent altogether. Reusable later as a template (section order, "not your job" list, output format, severity and confidence scales).
+- Code reviewers still to write, when we return to them: `code-review-correctness` (from the parked draft), `code-review-edge-cases`, `code-review-intent`, `code-review-test-gaps`, `code-review-security`, `code-review-simplicity`, `code-review-blind`.
+- Next: the user will describe a separate agent to start with.
 - When adding an agent: add a row to the README table, and check the "not your job" lists of the existing agents still point at the right names.
 - Open question: whether `tmp/memlog.md` gets pushed to the public repo or stays local.

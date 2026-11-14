@@ -27,22 +27,14 @@ The script needs bash and works on macOS and Linux. It is safe to run more than 
 
 ## Agents
 
-### Code review
-
-Each reviewer looks at a code change through one lens and stays out of the others, so running several together gives little duplication. All of them are read-only.
-
-| Agent | Lens |
-|---|---|
-| [`code-review-correctness`](agents/code-review-correctness.md) | Logic bugs, and contracts the change breaks with the code around it. |
-
-More are on the way.
+None published yet. They are being written.
 
 ## Using an agent
 
 Claude Code delegates to an agent on its own when a task matches the agent's description. You can also ask for one by name:
 
 ```
-Use the code-review-correctness agent to review my uncommitted changes.
+Use the <agent-name> agent to <task>.
 ```
 
 ## License
