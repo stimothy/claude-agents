@@ -71,7 +71,7 @@ Proposed prefix: `story-review-`.
   - Never edits settings files. It describes hooks and permission rules in its report for the user to add, because hooks run commands.
   - Returns without writing when the brief does not say what behaviour is wanted, why, and when it applies.
   - Makes the smallest change; does not rewrite or delete existing instructions unless asked.
-  - Open design point: the two agents each carry their own copy of the loading rules and frontmatter facts, so the copies can drift. A shared skill preloaded through the `skills` key would remove the duplication, but the installer only handles agents today.
+  - Open design point: the two agents each carry their own copy of the loading rules and frontmatter facts, so the copies can drift. A shared skill preloaded through the `skills` key would remove the duplication, but the installer only handles agents today. The user has a sibling repo, `claude-skills`, meant to work like this one but for skills (it held only a README on 2026-11-13). A shared skill would live there, which would make these agents depend on a second install.
 
 ## Agent file format (checked against the docs on 2026-11-13)
 
