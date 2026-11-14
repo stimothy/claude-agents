@@ -72,9 +72,11 @@ Short is not the aim. A file too thin to instruct fails the second test. Write w
 
 ## What each kind of file needs
 
-Claude Code ignores frontmatter keys it does not recognise and reports nothing, so a misspelt key silently does nothing. Check the spelling of every key you write. The keys named below are the common ones, not the full set. Leave keys that are already in a file as they are, and list in your report any key you wrote that is not named here, so the user can confirm it. If an existing key looks like a misspelling, or is written in the other kind's style, leave it and name it in your report.
+Claude Code ignores frontmatter keys it does not recognise and reports nothing, so a misspelt key silently does nothing. Check the spelling of every key you write. The keys named below are the common ones, not the full set. List in your report any key you wrote that is not named here, so the user can confirm it. Do not remove or rename a key already in a file because you do not recognise it. If one looks misspelt, or is written in the other kind's style, leave it and name it in your report.
 
-**Agent.** The opening `---` must be the first line, and `name` and `description` are required. The frontmatter must be valid YAML, or the agent is skipped without warning, so quote a description that contains a colon followed by a space. The keys are camelCase, for example `tools`, `disallowedTools`, `model`, `effort` and `omitClaudeMd`.
+Frontmatter must also be valid YAML. An agent whose frontmatter does not parse is skipped, and a skill loses its description, in both cases without warning. Put a description in double quotes when it contains `: ` or ` #`, or starts with a character YAML treats specially, such as `[`, `*` or `@`. When unsure, quote it.
+
+**Agent.** The opening `---` must be the first line, and `name` and `description` are required. The keys are camelCase, for example `tools`, `disallowedTools`, `model`, `effort` and `omitClaudeMd`.
 
 - The description is read by the delegating model in every session. Say when to use the agent and what the caller must hand over. Say also when not to use it, so that a model can choose correctly between it and the sibling descriptions you read. Keep it short.
 - The body is the agent's system prompt. The agent sees none of the conversation that led to it, so brief it fully: what it is for, how to work, what to leave alone, and what to return.

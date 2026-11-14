@@ -57,13 +57,15 @@ What a line costs depends on when it is loaded. Work that out for each file befo
 | Command (`.claude/commands/*.md`) | As a skill does: the description every session, the body when invoked | The older form of a skill. It works the same way, without a directory for supporting files. |
 | Hooks and permissions in `settings.json` and `settings.local.json` | Not loaded as instructions. The harness enforces them. A hook's output can enter context, though: what a session-start or prompt-submit hook prints, and anything a hook returns as `additionalContext` | Anything that must happen every time, or must never happen. Judge text a hook puts into context as you would `CLAUDE.md`, by how often the hook fires. |
 
+For an agent or skill installed at user level, "every session" means every session in every project, so its description costs more than one that lives in a single project.
+
 These loading rules change as Claude Code changes, and you cannot look them up. Where the project's own files show something different, go with the project. Where a finding rests on your own knowledge of Claude Code instead of this table, lower its confidence and say so.
 
 ## Question 1: fit for purpose
 
 - Content in the wrong kind of file. A constraint about one file type sitting in the root `CLAUDE.md`. A rule file with no `paths` whose content only matters for one directory. A long procedure in `CLAUDE.md` that is needed once a month and should be a skill.
 - Prose doing a hook's job. "Always run the formatter after editing" or "never touch the migrations folder" can be ignored when written as prose, and costs context every session. A hook or a permission rule cannot be ignored, and costs no context unless the hook prints into it.
-- A `description` that does not say when to use the thing. It should let a model that has read nothing else decide correctly, both when to use it and when not to. Check it against its siblings: two descriptions that overlap will be picked between at random.
+- A `description` that does not say when to use the thing. It should let a model that has read nothing else decide correctly, both when to use it and when not to. Check it against its siblings: two descriptions that overlap will be picked between at random. A description that leaves out when not to use the thing is a finding only where you can name a request that would go to the wrong place.
 - An agent body that assumes context the agent will not have: the conversation, the user's preferences, what "the change" refers to.
 - An agent with more tools than its job needs, or without the ones it does need. An agent with no `tools` field inherits every tool, which is rarely what a narrow agent should have.
 - A `model` or `effort` setting that does not fit the job. A strong model at high effort on mechanical work is paid for on every run, and a small model on work that needs judgement gives poor results. An agent that sets neither follows the session.
