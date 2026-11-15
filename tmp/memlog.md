@@ -39,17 +39,17 @@ Known gap, not fixed: when an agent is renamed or removed in the repository, its
 
 ## Code review roster (lenses settled)
 
-Naming pattern, chosen by the user on 2026-11-14: `code-review-<character noun>`. The prefix groups the roster and says what each agent is; the last word carries the character. `code-review-sleuth` is settled. The user liked the other six names as options; each is to be confirmed when its agent is written.
+Naming pattern, chosen by the user on 2026-11-14: `code-review-<character noun>`. The prefix groups the roster and says what each agent is; the last word carries the character. All seven are written under these names (PR #2).
 
 | Name | Status | Lens | Job |
 |---|---|---|---|
 | `code-review-sleuth` | settled, written | Correctness | Logic bugs and broken contracts with callers. Leaves boundary enumeration to edge cases. |
-| `code-review-advocate` | liked, not final | Intent alignment | Compare what was asked for with what was built. Speaks for the request. |
-| `code-review-pedant` | liked, not final | Edge cases | Mechanically walk branches, boundaries and failure paths. |
-| `code-review-doubter` | liked, not final | Verification gaps | Changes that could regress without any test noticing. |
-| `code-review-locksmith` | liked, not final | Security | Trust boundaries, injection, authorization, secrets. |
-| `code-review-minimalist` | liked, not final | Simplicity and maintainability | Needless complexity, duplication, wrong layer. |
-| `code-review-skeptic` | liked, not final | Blind hunter | Adversarial read of the diff only, with a strict severity bar. |
+| `code-review-advocate` | written | Intent alignment | Compare what was asked for with what was built. Speaks for the request. |
+| `code-review-pedant` | written | Edge cases | Mechanically walk branches, boundaries and failure paths. |
+| `code-review-doubter` | written | Verification gaps | Changes that could regress without any test noticing. |
+| `code-review-locksmith` | written | Security | Trust boundaries, injection, authorization, secrets. |
+| `code-review-minimalist` | written | Simplicity and maintainability | Needless complexity, duplication, wrong layer. |
+| `code-review-skeptic` | written | Blind hunter | Adversarial read of the diff only, with a strict severity bar. |
 
 Optional, not yet planned and not yet named: a performance reviewer (only for projects with hot paths or databases).
 
@@ -177,6 +177,17 @@ Also clarified in the first round: two load points in the per-file header line, 
   - Per file: pedant got cases for branches, arithmetic and dates, and always walks in priority order; advocate's requirements list carries a status per line, the linked issue outranks the pull request description, and it has a misread-versus-buggy test; doubter's "no tests" case is a statement and not a finding, repeated gaps are grouped, severity is by damage; locksmith never repeats a secret's value, separates committed from uncommitted secrets, states its assumed deployment, and does not run audit tools; minimalist counts uses through framework signatures, registration and test code before calling anything unused; skeptic claims only "blind, cold or diff-only" requests and may run only the `--json` form of `gh pr view`.
   - Final set review after the fixes: 11 findings, none high, all applied directly. The parallel edits held up (references resolve, shared sections agree). Fixed: locksmith trigger "safe" became "secure" so it does not claim "is this safe to merge?"; the advocate claims only "does it meet the request", and a review that merely mentions a ticket is the sleuth's; the minimalist's description excludes Claude instruction files and it no longer rates a public option (the advocate's ground); the sleuth owns error handling the change writes or alters and anything on a path it was tracing, not sweeps; the doubter's "no tests" statement has one condition (no test exercises any of the changed code in an area); the pedant's triggers include "error-handling"; the advocate does not use the current branch's pull request for uncommitted edits; the skeptic may run `git rev-parse --verify`; the locksmith rates a takedown by an ordinary account as medium.
   - Findings per round on the roster ran about 67, then 11, with the later ones mostly in text the earlier round added. Stopped reviewing there; real runs on code changes are the next test. None of the seven has been run on real code yet.
+  - PR #2 got two automated review comments (Codex, 2026-11-15), both valid, both on the shared text, fixed in `af3eca4` in the six non-blind reviewers:
+    - The pull request path checked only the head commit and diffed against `origin/<baseRefName>`, which may be missing or stale. It now asks for `baseRefOid` too, diffs `<baseRefOid>...<headRefOid>`, and takes the local path only when both commits exist; otherwise `gh pr diff`.
+    - A committed target that is checked out could be read from a working tree holding uncommitted edits, so an uncommitted fix or test could hide a problem. The working tree is now read only when the target's last commit is `HEAD` and `git status --short` prints nothing; otherwise `git show` and `git grep`.
+  - `claude-whisperer` review of that fix (one run, given the old and new sentences): the three sentences are identical across the six files and close both comments for branches, ranges and pull requests. Seven findings, none high. 1 to 6 applied; 7 skipped on purpose (narrow case, and it would add a command to a file kept deliberately tight). The applied wording has not been reviewed again:
+    1. Medium: the `gh pr diff` fallback now also happens when the head commit is local and only the base is missing, but "Stay read-only" still says the working tree does not hold that version. Read files at the head commit when it exists.
+    2. Medium: "How to review" reads the old version at `<base>`, which is undefined for a pull request and, for a three-dot diff, should be the merge base, not the base tip (sleuth, locksmith, doubter, pedant). Partly older than this fix.
+    3. Medium: named files whose change is already committed are not in the new sentence's list of committed targets, so uncommitted callers or tests can still be read as the change.
+    4. Medium: advocate step 2 says "reading the code as it stands", which means the working tree.
+    5. Low to medium: the branch bullet tests "the branch is checked out" (a name), where "Stay read-only" tests the commit; a branch checked out in another worktree would pass the first and fail the second.
+    6. Low: minimalist's "not only the working tree" pulls against the new rule.
+    7. Low, optional: the skeptic can still diff against a stale base when the caller names a local branch for a pull request.
   - Judged not worth fixing: "These belong to other lenses" (accurate now that the seven ship together); `gh` commands missing from an allowed list that says "such as".
   - Method worth repeating: per-file reviews found most of the problems, and the same shared-text faults surfaced in every one, which is what made a single corrected text the right fix. The set review found the routing and boundary problems the per-file reviews could not see.
 - README: the agents section is now two tables, one for the Claude-file pair and one for the code reviewers.
