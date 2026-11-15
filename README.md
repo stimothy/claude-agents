@@ -38,14 +38,28 @@ The script exits with status 1 when it skipped anything, so you can tell a parti
 
 ## Agents
 
+### For the files that instruct Claude
+
 | Agent | What it does |
 |---|---|
 | [`claude-whisperer`](agents/claude-whisperer.md) | Reviews the files that instruct Claude in a project (`CLAUDE.md`, `AGENTS.md`, `.claude/rules`, skills, agent definitions, commands, hooks). Judges whether each fits its purpose, will be understood and followed, and is worth the context it costs. Read-only. |
 | [`claude-wordsmith`](agents/claude-wordsmith.md) | Writes and edits those same files. Works out which kind of file an instruction belongs in, writes it so the agent reading it will follow it, and keeps it to what is worth its context. |
 
-| [`code-review-sleuth`](agents/code-review-sleuth.md) | Reviews a code change for correctness only: logic bugs, and contracts broken with the unchanged callers, callees and shared state around it. Reads beyond the diff. Leaves security, tests, edge-case sweeps and style to other reviews. Read-only. |
+The two are a pair: `claude-wordsmith` writes, `claude-whisperer` reviews.
 
-`claude-wordsmith` and `claude-whisperer` are a pair: `claude-wordsmith` writes, `claude-whisperer` reviews.
+### For reviewing code
+
+Each reviewer looks at a code change through one lens and leaves the rest to the others, so that each goes deep and their findings do not repeat. All are read-only: they report findings and never edit. A code review with no lens named goes to `code-review-sleuth`; ask for the others by name or by what they check.
+
+| Agent | Lens | What it looks for |
+|---|---|---|
+| [`code-review-sleuth`](agents/code-review-sleuth.md) | Correctness | Logic bugs, and contracts broken with the unchanged callers, callees and shared state around the change. |
+| [`code-review-pedant`](agents/code-review-pedant.md) | Edge cases | What happens at the boundaries and on the failure paths of each input, branch and external call. |
+| [`code-review-advocate`](agents/code-review-advocate.md) | Intent | Requirements missed, misread or only partly met, and work nobody asked for. Needs the request, or to be told where it is written. |
+| [`code-review-doubter`](agents/code-review-doubter.md) | Test gaps | Changed behaviour that no test would notice breaking, tests that cannot fail, and tests deleted or weakened. |
+| [`code-review-locksmith`](agents/code-review-locksmith.md) | Security | Whether the change lets someone do, see or change something they should not. |
+| [`code-review-minimalist`](agents/code-review-minimalist.md) | Simplicity | Needless abstraction, duplication, misplaced logic and dead code, each with the simpler version named. |
+| [`code-review-skeptic`](agents/code-review-skeptic.md) | Blind read | Reads only the diff, assumes it is wrong, and reports only serious problems, each with the one thing to check. |
 
 More are on the way.
 
