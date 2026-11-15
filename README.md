@@ -43,7 +43,9 @@ The script exits with status 1 when it skipped anything, so you can tell a parti
 | [`claude-whisperer`](agents/claude-whisperer.md) | Reviews the files that instruct Claude in a project (`CLAUDE.md`, `AGENTS.md`, `.claude/rules`, skills, agent definitions, commands, hooks). Judges whether each fits its purpose, will be understood and followed, and is worth the context it costs. Read-only. |
 | [`claude-wordsmith`](agents/claude-wordsmith.md) | Writes and edits those same files. Works out which kind of file an instruction belongs in, writes it so the agent reading it will follow it, and keeps it to what is worth its context. |
 
-The two are a pair: `claude-wordsmith` writes, `claude-whisperer` reviews.
+| [`code-review-sleuth`](agents/code-review-sleuth.md) | Reviews a code change for correctness only: logic bugs, and contracts broken with the unchanged callers, callees and shared state around it. Reads beyond the diff. Leaves security, tests, edge-case sweeps and style to other reviews. Read-only. |
+
+`claude-wordsmith` and `claude-whisperer` are a pair: `claude-wordsmith` writes, `claude-whisperer` reviews.
 
 More are on the way.
 

@@ -37,19 +37,21 @@ Known gap, not fixed: when an agent is renamed or removed in the repository, its
 - Shared output format: location, severity, concrete description of the problem, confidence.
 - Reviewers read beyond the diff (callers, surrounding code) unless the lens is blind by design.
 
-## Code review roster (lenses settled, names proposed)
+## Code review roster (lenses settled)
 
-| Proposed name | Lens | Job |
-|---|---|---|
-| `code-review-intent` | Intent alignment | Compare what was asked for with what was built. |
-| `code-review-correctness` | Correctness | Logic bugs and broken contracts with callers. Leaves boundary enumeration to edge cases. |
-| `code-review-edge-cases` | Edge cases | Mechanically walk branches, boundaries and failure paths. |
-| `code-review-test-gaps` | Verification gaps | Changes that could regress without any test noticing. |
-| `code-review-security` | Security | Trust boundaries, injection, authorization, secrets. |
-| `code-review-simplicity` | Simplicity and maintainability | Needless complexity, duplication, wrong layer. |
-| `code-review-blind` | Blind hunter | Adversarial read of the diff only, with a strict severity bar. |
+Naming pattern, chosen by the user on 2026-11-14: `code-review-<character noun>`. The prefix groups the roster and says what each agent is; the last word carries the character. `code-review-sleuth` is settled. The user liked the other six names as options; each is to be confirmed when its agent is written.
 
-Optional, not yet planned: `code-review-performance` (only for projects with hot paths or databases).
+| Name | Status | Lens | Job |
+|---|---|---|---|
+| `code-review-sleuth` | settled, written | Correctness | Logic bugs and broken contracts with callers. Leaves boundary enumeration to edge cases. |
+| `code-review-advocate` | liked, not final | Intent alignment | Compare what was asked for with what was built. Speaks for the request. |
+| `code-review-pedant` | liked, not final | Edge cases | Mechanically walk branches, boundaries and failure paths. |
+| `code-review-doubter` | liked, not final | Verification gaps | Changes that could regress without any test noticing. |
+| `code-review-locksmith` | liked, not final | Security | Trust boundaries, injection, authorization, secrets. |
+| `code-review-minimalist` | liked, not final | Simplicity and maintainability | Needless complexity, duplication, wrong layer. |
+| `code-review-skeptic` | liked, not final | Blind hunter | Adversarial read of the diff only, with a strict severity bar. |
+
+Optional, not yet planned and not yet named: a performance reviewer (only for projects with hot paths or databases).
 
 ## Prompt and config review roster (first draft, needs revising)
 
@@ -149,8 +151,16 @@ Second pass by the same reviewer: six of the seven resolved, finding 2 partly. F
 Still untested: the agent's search behaviour in an audit (Glob and Grep were unavailable to the reviewer in the second pass), and the cost checklist, because this repo has no `CLAUDE.md`, rules or skills. Next real test: install it and run it on a repo with a full Claude setup.
 
 Also clarified in the first round: two load points in the per-file header line, "No findings" keeps the header, replacement wording allowed within a sentence, which neighbouring files to read, conditional problems, and a second `Question` value.
-- `code-review-correctness`: first draft parked at `tmp/code-review-correctness.md`, not reviewed and not installed. Shelved because the user wants to start with a different agent altogether. Reusable later as a template (section order, "not your job" list, output format, severity and confidence scales).
-- Code reviewers still to write, when we return to them: `code-review-correctness` (from the parked draft), `code-review-edge-cases`, `code-review-intent`, `code-review-test-gaps`, `code-review-security`, `code-review-simplicity`, `code-review-blind`.
+- `code-review-sleuth` (first called `code-review-correctness`; the user chose the name): written to `agents/code-review-sleuth.md` on 2026-11-14 by the installed `claude-wordsmith` (its first real run), from the parked draft at `tmp/code-review-correctness.md`. Not yet reviewed by `claude-whisperer`, not yet run, not committed.
+  - `tools: Read, Grep, Glob, Bash`, `model: opus`, `effort: high`. Bash is needed for `git diff`, so read-only is held by instruction, not by the tool list. If cost per run is a problem, lower `effort` to `medium` and keep Opus.
+  - `omitClaudeMd` left at the default: a project's `CLAUDE.md` is evidence of what the code is meant to do. The body tells it to ignore build, test and edit instructions found there.
+  - Written to be correct when installed alone: the other lenses are described as out of scope, with no `code-review-*` names, since none of those agents exists.
+  - Additions over the draft: untracked files are included in "uncommitted changes"; steps per kind of target (pasted diff, range or branch, pull request, named files); how to work out what the change is trying to do; what to prioritise on a change too large to trace.
+  - Open: it may run `gh pr diff` (network, changes nothing) for a pull request with no local branch.
+  - Reviewed by the installed `claude-whisperer` on 2026-11-14 (its first real run; Grep and Glob worked). Four findings. Three applied by `claude-wordsmith`: a revision that is not checked out is read with `git show <rev>:<path>` and searched with `git grep <pattern> <rev>`, and a `gh pr diff` is treated as a pasted diff; named files with no change are reviewed whole, and the pre-existing-problems exclusion does not apply to them; a serious out-of-lens problem noticed in passing gets one line at the end under `Noticed in passing, not investigated:`, because no sibling reviewer exists to catch it. Not yet re-reviewed after those edits.
+  - Fourth finding, not applied: read-only Bash is held only by prose. Checked against the docs (sub-agents, hooks) on 2026-11-15: `tools` takes bare tool names only; a pattern in `disallowedTools`, such as `Bash(git push *)`, "still removes the whole tool". Options that remain: a `PreToolUse` hook in the agent's `hooks` key (gets the command as JSON on stdin, blocks with exit code 2; the docs' example uses a script file, which the installer does not ship, and an inline one-liner is untested), or `permissionMode: plan` (unconfirmed whether `git diff` still runs under it). Left as prose until the agent has had real runs.
+  - Template for the remaining reviewers: section order, "not your job" list, output format, severity and confidence scales.
+- Code reviewers still to write (names from the roster table above): `code-review-advocate`, `code-review-pedant`, `code-review-doubter`, `code-review-locksmith`, `code-review-minimalist`, `code-review-skeptic`.
 - `claude-whisperer` has been through two self-review rounds (see below). The user wants both agents in before merging the branch.
 - Next: merge the branch, install, and try both agents on a repo with a real Claude setup.
 - When adding an agent: add a row to the README table, and check the "not your job" lists of the existing agents still point at the right names.
