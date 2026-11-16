@@ -68,6 +68,33 @@ Reviewers describe problems and never rewrite prose unless asked.
 To do: rework using the method lenses, as above.
 Proposed prefix: `story-review-`.
 
+## Story-review roster (written 2026-11-15, reviewed, review not applied)
+
+Replaces the "Fiction review roster" draft above. Eleven agents under `agents/story-review-*.md`, for a novel's story bible and manuscript. The user is starting a novel and will build its bible with Claude.
+
+| Name | Lens |
+|---|---|
+| `story-review-archivist` | Continuity. Takes a story-bible review that names no lens. The template for the rest. |
+| `story-review-heckler` | Rule implications ("then why doesn't someone just...?") |
+| `story-review-cartographer` | Coverage: what the plot needs that is unstated, and unused material |
+| `story-review-shrink` | Character |
+| `story-review-dramaturg` | Structure |
+| `story-review-oathkeeper` | Fit to the author's stated intent |
+| `story-review-stranger` | Cold read with no bible (`tools: Read, Glob`, `omitClaudeMd: true`) |
+| `story-review-stylist` | Prose |
+| `story-review-scholar` | Real-world accuracy, no web access |
+| `story-review-librarian` | The bible as a working document (`sonnet`; the rest are `opus`) |
+| `story-review-turing` | Machine-patterned writing, which the user calls AI-isms. Added at the user's request. |
+
+- Names were proposed in the session and the user said to build them; `turing` was not separately confirmed.
+- All are read-only by tool list (no Bash), so the caller names files or pastes text. They describe problems and never rewrite.
+- Method: the archivist was written by `claude-wordsmith`, reviewed by `claude-whisperer`, fixed, and signed off by the user. The other ten were then written in parallel from it with one shared brief, and reviewed in parallel: ten individual reviews plus one of the set.
+- The AI-isms checklist in the turing came from a web research pass; the condensed notes are in `tmp/ai-isms-research.md`.
+- State: the archivist's first-round fixes are applied. Nothing from the second round is applied. The findings are in `tmp/story-review-findings/` (one file per agent, `roster.md` for the set, `README.md` for counts and the cross-file decisions). Eight high findings in all. The user ran out of time and asked for the review to be saved.
+- Next: settle the cross-file decisions in `tmp/story-review-findings/README.md`, then one `claude-wordsmith` run per file with its findings file plus one shared text for the decisions, then a set review. After that, add the roster to the README's agent tables.
+- The user plans skills later that show when to use one story reviewer over another. None exist yet.
+- Raised by the reviews, outside the agents: a per-roster install option, since the eleven descriptions add about 690 words to every session for every user of the repository.
+
 ## Status
 
 - Scaffolding written: `scripts/install.sh`, `README.md`, `LICENSE`. Installer tested against a throwaway config directory and is shellcheck-clean.
