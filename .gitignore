@@ -1,2 +1,4 @@
 # Editor and IDE settings
 .idea/
+.claude/worktrees
+.serena
