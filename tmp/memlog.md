@@ -37,19 +37,21 @@ Known gap, not fixed: when an agent is renamed or removed in the repository, its
 - Shared output format: location, severity, concrete description of the problem, confidence.
 - Reviewers read beyond the diff (callers, surrounding code) unless the lens is blind by design.
 
-## Code review roster (lenses settled, names proposed)
+## Code review roster (lenses settled)
 
-| Proposed name | Lens | Job |
-|---|---|---|
-| `code-review-intent` | Intent alignment | Compare what was asked for with what was built. |
-| `code-review-correctness` | Correctness | Logic bugs and broken contracts with callers. Leaves boundary enumeration to edge cases. |
-| `code-review-edge-cases` | Edge cases | Mechanically walk branches, boundaries and failure paths. |
-| `code-review-test-gaps` | Verification gaps | Changes that could regress without any test noticing. |
-| `code-review-security` | Security | Trust boundaries, injection, authorization, secrets. |
-| `code-review-simplicity` | Simplicity and maintainability | Needless complexity, duplication, wrong layer. |
-| `code-review-blind` | Blind hunter | Adversarial read of the diff only, with a strict severity bar. |
+Naming pattern, chosen by the user on 2026-11-14: `code-review-<character noun>`. The prefix groups the roster and says what each agent is; the last word carries the character. All seven are written under these names (PR #2).
 
-Optional, not yet planned: `code-review-performance` (only for projects with hot paths or databases).
+| Name | Status | Lens | Job |
+|---|---|---|---|
+| `code-review-sleuth` | settled, written | Correctness | Logic bugs and broken contracts with callers. Leaves boundary enumeration to edge cases. |
+| `code-review-advocate` | written | Intent alignment | Compare what was asked for with what was built. Speaks for the request. |
+| `code-review-pedant` | written | Edge cases | Mechanically walk branches, boundaries and failure paths. |
+| `code-review-doubter` | written | Verification gaps | Changes that could regress without any test noticing. |
+| `code-review-locksmith` | written | Security | Trust boundaries, injection, authorization, secrets. |
+| `code-review-minimalist` | written | Simplicity and maintainability | Needless complexity, duplication, wrong layer. |
+| `code-review-skeptic` | written | Blind hunter | Adversarial read of the diff only, with a strict severity bar. |
+
+Optional, not yet planned and not yet named: a performance reviewer (only for projects with hot paths or databases).
 
 ## Prompt and config review roster (first draft, needs revising)
 
@@ -149,8 +151,46 @@ Second pass by the same reviewer: six of the seven resolved, finding 2 partly. F
 Still untested: the agent's search behaviour in an audit (Glob and Grep were unavailable to the reviewer in the second pass), and the cost checklist, because this repo has no `CLAUDE.md`, rules or skills. Next real test: install it and run it on a repo with a full Claude setup.
 
 Also clarified in the first round: two load points in the per-file header line, "No findings" keeps the header, replacement wording allowed within a sentence, which neighbouring files to read, conditional problems, and a second `Question` value.
-- `code-review-correctness`: first draft parked at `tmp/code-review-correctness.md`, not reviewed and not installed. Shelved because the user wants to start with a different agent altogether. Reusable later as a template (section order, "not your job" list, output format, severity and confidence scales).
-- Code reviewers still to write, when we return to them: `code-review-correctness` (from the parked draft), `code-review-edge-cases`, `code-review-intent`, `code-review-test-gaps`, `code-review-security`, `code-review-simplicity`, `code-review-blind`.
+- `code-review-sleuth` (first called `code-review-correctness`; the user chose the name): written to `agents/code-review-sleuth.md` on 2026-11-14 by the installed `claude-wordsmith` (its first real run), from the parked draft at `tmp/code-review-correctness.md`. Not yet reviewed by `claude-whisperer`, not yet run, not committed.
+  - `tools: Read, Grep, Glob, Bash`, `model: opus`, `effort: high`. Bash is needed for `git diff`, so read-only is held by instruction, not by the tool list. If cost per run is a problem, lower `effort` to `medium` and keep Opus.
+  - `omitClaudeMd` left at the default: a project's `CLAUDE.md` is evidence of what the code is meant to do. The body tells it to ignore build, test and edit instructions found there.
+  - Written to be correct when installed alone: the other lenses are described as out of scope, with no `code-review-*` names, since none of those agents exists.
+  - Additions over the draft: untracked files are included in "uncommitted changes"; steps per kind of target (pasted diff, range or branch, pull request, named files); how to work out what the change is trying to do; what to prioritise on a change too large to trace.
+  - Open: it may run `gh pr diff` (network, changes nothing) for a pull request with no local branch.
+  - Reviewed by the installed `claude-whisperer` on 2026-11-14 (its first real run; Grep and Glob worked). Four findings. Three applied by `claude-wordsmith`: a revision that is not checked out is read with `git show <rev>:<path>` and searched with `git grep <pattern> <rev>`, and a `gh pr diff` is treated as a pasted diff; named files with no change are reviewed whole, and the pre-existing-problems exclusion does not apply to them; a serious out-of-lens problem noticed in passing gets one line at the end under `Noticed in passing, not investigated:`, because no sibling reviewer exists to catch it. Not yet re-reviewed after those edits.
+  - Fourth finding, not applied: read-only Bash is held only by prose. Checked against the docs (sub-agents, hooks) on 2026-11-15: `tools` takes bare tool names only; a pattern in `disallowedTools`, such as `Bash(git push *)`, "still removes the whole tool". Options that remain: a `PreToolUse` hook in the agent's `hooks` key (gets the command as JSON on stdin, blocks with exit code 2; the docs' example uses a script file, which the installer does not ship, and an inline one-liner is untested), or `permissionMode: plan` (unconfirmed whether `git diff` still runs under it). Left as prose until the agent has had real runs.
+  - Template for the remaining reviewers: section order, "not your job" list, output format, severity and confidence scales.
+- The other six code reviewers were written on 2026-11-15, each by its own `claude-wordsmith` run, with the sleuth as template: `code-review-pedant`, `code-review-advocate`, `code-review-doubter`, `code-review-locksmith`, `code-review-minimalist`, `code-review-skeptic`. The user confirmed the names by asking for them to be written. Uncommitted, and not yet reviewed.
+  - Models: `sonnet` at `high` for the pedant and doubter (methodical work, tried on the cheaper model; the user chose this for the pedant); `opus` at `high` for the rest.
+  - The shared skeleton (read-only rules, finding the change, output format) is copied into each file, not shared through a skill. The user chose copying for now; revisit once it is clear what is truly common.
+  - Routing: a code review with no lens named goes to the sleuth; every other description claims only requests that name its lens.
+  - Advocate: needs a statement of what was asked for and returns without reviewing if it finds none. Its output carries a numbered requirements list before the findings, and each finding has a `Kind` (missing, misread, partial, unrequested). May run `gh pr view` and `gh issue view`.
+  - Doubter: never runs tests; for each changed behaviour it names a breakage and reasons from the test code whether any test would fail.
+  - Locksmith: defensive only; works out who can reach the code before treating input as attacker-controlled; reports a found secret's location and type, not its value. Finding fields are Attacker, Path, Gain.
+  - Minimalist: a finding must name the simpler version; three severity levels, not four; judges against the codebase's own conventions.
+  - Skeptic: `tools: Read, Bash` and `omitClaudeMd: true` so the tool list helps hold the blindness; `git diff -U20`; critical and high only; no `Noticed in passing` section.
+  - Notes the writers raised on the sleuth's shared skeleton, to settle in the roster review and then apply to all seven files: `git status` hides files inside new untracked directories unless `--untracked-files=all`; `git symbolic-ref refs/remotes/origin/HEAD` returns a full ref while the next step uses a bare branch name; for a pull request with no local branch, reading touched files "as they stand" reads the wrong revision; "These belong to other lenses" assumes siblings exist; `gh pr diff` is used but not listed among the allowed commands; `git diff HEAD` fails in a repository with no commits.
+- Review round on the roster (2026-11-15): eight `claude-whisperer` runs, one per file plus one on the seven as a set. About 54 per-file findings and 13 set findings, two of them high (the locksmith's description claimed any change "touching" input handling and so competed with the sleuth; untracked files inside new directories were missed). The user said to apply everything. Applied by seven `claude-wordsmith` runs, one per file, all reading one corrected shared text so the copies match. Not yet re-reviewed.
+  - Shared text now in every file ("Finding the change" is identical across six files apart from the lens sentence; the skeptic has an adapted version): default branch found once with `git symbolic-ref --short`; a pasted diff is checked for whether it is applied; a pull request is taken by its head commit from `gh pr view --json headRefName,baseRefName,headRefOid`, falling back to `gh pr diff`, never by a possibly stale local branch name; after `gh pr diff` the working tree is used only for unchanged surrounding code; "uncommitted changes" is a nameable target that stops on a clean tree; named files are decided per file (untracked, uncommitted edits, changed on the branch, or unchanged); untracked files come from `git status --untracked-files=all`, skipping generated, vendored, binary and very large files; a repository with no commits is handled.
+  - Descriptions: the six lens-specific ones were cut to about 50 words each (lens, triggers that name the lens, pointer to the sleuth, target sentence, "Read-only"). The sleuth keeps the full target list and the exclusion of Claude instruction files and prose, because it is the catch-all. Total across the seven went from about 590 words to about 400.
+  - Boundaries settled: sleuth reports a boundary or failure-path problem only on a path it was already tracing, the pedant sweeps them; a crash an outside caller can trigger is reported by the pedant as a crash and judged as denial of service by the locksmith; user-visible unrequested features and options are the advocate's, internal generality is the minimalist's; the doubter's example breakages include "moving a boundary by one" so untested boundaries are caught.
+  - Per file: pedant got cases for branches, arithmetic and dates, and always walks in priority order; advocate's requirements list carries a status per line, the linked issue outranks the pull request description, and it has a misread-versus-buggy test; doubter's "no tests" case is a statement and not a finding, repeated gaps are grouped, severity is by damage; locksmith never repeats a secret's value, separates committed from uncommitted secrets, states its assumed deployment, and does not run audit tools; minimalist counts uses through framework signatures, registration and test code before calling anything unused; skeptic claims only "blind, cold or diff-only" requests and may run only the `--json` form of `gh pr view`.
+  - Final set review after the fixes: 11 findings, none high, all applied directly. The parallel edits held up (references resolve, shared sections agree). Fixed: locksmith trigger "safe" became "secure" so it does not claim "is this safe to merge?"; the advocate claims only "does it meet the request", and a review that merely mentions a ticket is the sleuth's; the minimalist's description excludes Claude instruction files and it no longer rates a public option (the advocate's ground); the sleuth owns error handling the change writes or alters and anything on a path it was tracing, not sweeps; the doubter's "no tests" statement has one condition (no test exercises any of the changed code in an area); the pedant's triggers include "error-handling"; the advocate does not use the current branch's pull request for uncommitted edits; the skeptic may run `git rev-parse --verify`; the locksmith rates a takedown by an ordinary account as medium.
+  - Findings per round on the roster ran about 67, then 11, with the later ones mostly in text the earlier round added. Stopped reviewing there; real runs on code changes are the next test. None of the seven has been run on real code yet.
+  - PR #2 got two automated review comments (Codex, 2026-11-15), both valid, both on the shared text, fixed in `af3eca4` in the six non-blind reviewers:
+    - The pull request path checked only the head commit and diffed against `origin/<baseRefName>`, which may be missing or stale. It now asks for `baseRefOid` too, diffs `<baseRefOid>...<headRefOid>`, and takes the local path only when both commits exist; otherwise `gh pr diff`.
+    - A committed target that is checked out could be read from a working tree holding uncommitted edits, so an uncommitted fix or test could hide a problem. The working tree is now read only when the target's last commit is `HEAD` and `git status --short` prints nothing; otherwise `git show` and `git grep`.
+  - `claude-whisperer` review of that fix (one run, given the old and new sentences): the three sentences are identical across the six files and close both comments for branches, ranges and pull requests. Seven findings, none high. 1 to 6 applied; 7 skipped on purpose (narrow case, and it would add a command to a file kept deliberately tight). The applied wording has not been reviewed again:
+    1. Medium: the `gh pr diff` fallback now also happens when the head commit is local and only the base is missing, but "Stay read-only" still says the working tree does not hold that version. Read files at the head commit when it exists.
+    2. Medium: "How to review" reads the old version at `<base>`, which is undefined for a pull request and, for a three-dot diff, should be the merge base, not the base tip (sleuth, locksmith, doubter, pedant). Partly older than this fix.
+    3. Medium: named files whose change is already committed are not in the new sentence's list of committed targets, so uncommitted callers or tests can still be read as the change.
+    4. Medium: advocate step 2 says "reading the code as it stands", which means the working tree.
+    5. Low to medium: the branch bullet tests "the branch is checked out" (a name), where "Stay read-only" tests the commit; a branch checked out in another worktree would pass the first and fail the second.
+    6. Low: minimalist's "not only the working tree" pulls against the new rule.
+    7. Low, optional: the skeptic can still diff against a stale base when the caller names a local branch for a pull request.
+  - Judged not worth fixing: "These belong to other lenses" (accurate now that the seven ship together); `gh` commands missing from an allowed list that says "such as".
+  - Method worth repeating: per-file reviews found most of the problems, and the same shared-text faults surfaced in every one, which is what made a single corrected text the right fix. The set review found the routing and boundary problems the per-file reviews could not see.
+- README: the agents section is now two tables, one for the Claude-file pair and one for the code reviewers.
 - `claude-whisperer` has been through two self-review rounds (see below). The user wants both agents in before merging the branch.
 - Next: merge the branch, install, and try both agents on a repo with a real Claude setup.
 - When adding an agent: add a row to the README table, and check the "not your job" lists of the existing agents still point at the right names.
