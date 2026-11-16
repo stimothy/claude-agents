@@ -1,0 +1,13 @@
+# Review findings: agents/story-review-librarian.md (claude-whisperer, individual review)
+
+1. High. Lines 48, 49, 53, 69, 107-108, 122. The lens's top-severity finding (an unmarked superseded version beside canon) is also a "disagreeing copy", which lines 48 and 69 say is not the agent's and gets only a passing note. The archivist claims every disagreeing repeat too. Fix: draw the line by marking, not by agreement. If something on the page marks or positions one statement as an older version (struck through, "old:", a revision kept inline, an entry built on a story the outline has dropped), the problem is status marking and is the librarian's finding. If both statements read as current canon, it is continuity's and gets the one-line note. Say this at lines 48 and 69. (The archivist's file gets the matching line.)
+
+2. Medium. Lines 17, 54, 79, 108. A load map in CLAUDE.md "counts as the bible's map" (17) and a bad one is rated high (108), but line 79 says do not review instruction files. Fix: state the exception once: "A load map in CLAUDE.md is checked only for whether its targets exist and cover the bible; anything else about the instruction files is for claude-whisperer." Drop the repeated "do not review" at line 17.
+
+3. Low. Lines 53, 71. "Staleness" overlaps the coverage lens's "unused material" with no tie-break (the example, a detective's sheet built around a partner the outline no longer has, is exactly what coverage reports as unused). Fix: the librarian reports an entry as stale only where it competes with a current entry or outline step and could be read as canon; an orphaned entry for dropped material that nothing competes with is coverage's unused material. (The cartographer's file gets the matching line.)
+
+4. Low. Line 3. The description says "A review naming no lens is story-review-archivist's", dropping "story-bible"; read alone it claims any review. Fix: restore "A story-bible review naming no lens is story-review-archivist's."
+
+5. Low. Lines 23, 44. On a change review, "three things only" and "the rest of the inventory is out of scope" leave unclear whether the changed text itself gets the full lens. Fix: add to line 23: "Judge the changed text itself against everything under 'What you look for'; the three checks are the limit for the rest of the bible."
+
+6. Optional (reviewer's answers to questions). The Grep-for-`^` line count works; add "scope it to the bible's path and set head_limit 0" so a large bible is not cut off at 250 entries. The exception that disagreeing copies always get a `Noticed in passing` line is defensible but needs its reason in one clause ("they are the drift this lens predicts") and a cap ("past five, give the count and the five most central").
