@@ -1,6 +1,6 @@
-# Story-review roster: settled decisions for the fix round
+# Story-review roster: settled boundaries and shared text
 
-Written 2026-11-16. This is the one answer to every question that spans files. Where a per-file findings file or `roster.md` says something different, this file wins. Each boundary is written here once; both files on either side of it state it in these terms, each from its own side.
+Written 2026-11-16. This is the one answer to every question that spans files. The review findings it settled were applied on 2026-11-16 and their files removed; they remain in the git history up to commit `5a27969`. Each boundary is written here once; both files on either side of it state it in these terms, each from its own side.
 
 Lens names used in the bodies: continuity (archivist), rule implications (heckler), coverage (cartographer), character (shrink), structure (dramaturg), intent (oathkeeper), cold read (stranger), prose (stylist), real-world accuracy (scholar), working document (librarian), machine-patterned writing (turing). Bodies refer to other lenses by lens name, as they do now; descriptions use agent names.
 
@@ -78,5 +78,5 @@ D21. Tools, models and effort are unchanged in every file. All reviewers stay re
 
 ## Not in this round
 
-- `roster.md` finding 19's check script (grep the eleven files for the shared sentences). This file is the canonical boundary table it asks for.
+- A check script that greps the eleven files for the shared sentences. This file is the canonical boundary table such a check would read.
 - A per-roster install option in `scripts/install.sh`.
