@@ -68,7 +68,7 @@ Reviewers describe problems and never rewrite prose unless asked.
 To do: rework using the method lenses, as above.
 Proposed prefix: `story-review-`.
 
-## Story-review roster (written 2026-11-15, reviewed, review not applied)
+## Story-review roster (written 2026-11-15, review applied 2026-11-16, not re-reviewed)
 
 Replaces the "Fiction review roster" draft above. Eleven agents under `agents/story-review-*.md`, for a novel's story bible and manuscript. The user is starting a novel and will build its bible with Claude.
 
@@ -90,8 +90,9 @@ Replaces the "Fiction review roster" draft above. Eleven agents under `agents/st
 - All are read-only by tool list (no Bash), so the caller names files or pastes text. They describe problems and never rewrite.
 - Method: the archivist was written by `claude-wordsmith`, reviewed by `claude-whisperer`, fixed, and signed off by the user. The other ten were then written in parallel from it with one shared brief, and reviewed in parallel: ten individual reviews plus one of the set.
 - The AI-isms checklist in the turing came from a web research pass; the condensed notes are in `tmp/ai-isms-research.md`.
-- State: the archivist's first-round fixes are applied. Nothing from the second round is applied. The findings are in `tmp/story-review-findings/` (one file per agent, `roster.md` for the set, `README.md` for counts and the cross-file decisions). Eight high findings in all. The user ran out of time and asked for the review to be saved.
-- Next: settle the cross-file decisions in `tmp/story-review-findings/README.md`, then one `claude-wordsmith` run per file with its findings file plus one shared text for the decisions, then a set review. After that, add the roster to the README's agent tables.
+- State (2026-11-16): the second-round findings are applied to all eleven files, one `claude-wordsmith` run per file, each given its findings file, `roster.md` and `tmp/story-review-findings/decisions.md` (the settled answer to every cross-file question; it wins over the findings files). The fixes have not been re-reviewed: the user was short of tokens, so no `claude-whisperer` pass followed. Only mechanical checks ran (frontmatter unchanged, descriptions 58 to 70 words, shared sentences identical by grep, install tests pass). The roster is in the README's agent tables.
+- Deliberately left: the scholar stays offline; no reviewer rewrites on request; no per-roster install option; no script that greps for the shared sentences. Scholar finding 7's "a nameable local exception is medium" was dropped in favour of sending such claims to `Worth verifying:`. The cartographer's unused-material findings no longer carry a severity.
+- Next: a `claude-whisperer` set review of the eleven files against `decisions.md`, checking that both sides of each boundary say the same thing.
 - The user plans skills later that show when to use one story reviewer over another. None exist yet.
 - Raised by the reviews, outside the agents: a per-roster install option, since the eleven descriptions add about 690 words to every session for every user of the repository.
 

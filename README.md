@@ -61,6 +61,24 @@ Each reviewer looks at a code change through one lens and leaves the rest to the
 | [`code-review-minimalist`](agents/code-review-minimalist.md) | Simplicity | Needless abstraction, duplication, misplaced logic and dead code, each with the simpler version named. |
 | [`code-review-skeptic`](agents/code-review-skeptic.md) | Blind read | Reads only the diff, assumes it is wrong, and reports only serious problems, each with the one thing to check. |
 
+### For reviewing a novel's story bible and manuscript
+
+A story bible is the working reference a novelist keeps for a book: its characters, world and rules, timeline, places, plot outline and style notes. Each reviewer looks at the bible, the outline or the chapters through one lens and leaves the rest to the others. All are read-only and none rewrites the author's prose: they describe problems and leave the fixing to the author. They cannot run git, so name the files or paste the text. A story-bible review with no lens named goes to `story-review-archivist`, and a chapter review with no lens named goes to `story-review-stylist`; ask for the others by name or by what they check.
+
+| Agent | Lens | What it looks for |
+|---|---|---|
+| [`story-review-archivist`](agents/story-review-archivist.md) | Continuity | Contradictions between stated facts in the bible, or between a chapter and the bible. |
+| [`story-review-heckler`](agents/story-review-heckler.md) | Rule implications | What the world's stated rules imply that the plot ignores or cannot survive: loopholes and "why doesn't someone just" holes. |
+| [`story-review-cartographer`](agents/story-review-cartographer.md) | Coverage | What the outline needs that the bible never states, and material the story never uses. |
+| [`story-review-shrink`](agents/story-review-shrink.md) | Character | Whether people's wants, fears and beliefs would make them do what the outline needs, and whether their arcs have causes. |
+| [`story-review-dramaturg`](agents/story-review-dramaturg.md) | Structure | Whether events cause one another, coincidence, stakes, setup and payoff, pacing across chapters, and an earned ending. |
+| [`story-review-oathkeeper`](agents/story-review-oathkeeper.md) | Intent | Whether the bible serves the book the author set out to write. Needs the statement of intent, or to be told where it is written. |
+| [`story-review-stranger`](agents/story-review-stranger.md) | Cold read | Reads the outline or chapters without the bible, as a reader would, and reports what confuses, what is assumed and where interest drops. |
+| [`story-review-stylist`](agents/story-review-stylist.md) | Prose | Manuscript sentences against the author's own voice: clarity, rhythm, word choice, point of view, tense. |
+| [`story-review-scholar`](agents/story-review-scholar.md) | Real-world accuracy | Claims about history, science, medicine, law, geography and trades. It cannot look things up, so it separates what it is sure of from what is worth verifying. |
+| [`story-review-librarian`](agents/story-review-librarian.md) | Working document | Whether a writer, or Claude drafting, can find the one current answer: organisation, repeated facts, stale entries, canon marked off from notes. |
+| [`story-review-turing`](agents/story-review-turing.md) | Machine-patterned writing | Wording, constructions, punctuation, default names and stock details that make text read as AI-written. It reports patterns and makes no claim about who wrote the text. |
+
 More are on the way.
 
 ## Using an agent

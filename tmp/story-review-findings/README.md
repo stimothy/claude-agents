@@ -1,6 +1,6 @@
-# Story-review roster: review findings, not yet applied
+# Story-review roster: review findings (applied 2026-11-16)
 
-Reviews by `claude-whisperer` on 2026-11-15 of the ten `agents/story-review-*.md` files written that day. One file per agent, condensed from each review, with line numbers as they stood at commit `e457fb8`. None of these findings has been applied. `roster.md` holds the review of all eleven files as a set.
+Reviews by `claude-whisperer` on 2026-11-15 of the ten `agents/story-review-*.md` files written that day. One file per agent, condensed from each review, with line numbers as they stood at commit `e457fb8`. These findings were applied on 2026-11-16 as settled in `decisions.md`; the applied files have not been re-reviewed. `roster.md` holds the review of all eleven files as a set.
 
 `story-review-archivist` was reviewed earlier the same day and its six findings were applied before the other ten were written from it. It has no file here; what it still needs is in `roster.md`.
 
