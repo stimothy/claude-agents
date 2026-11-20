@@ -81,6 +81,8 @@ A story bible is the working reference a novelist keeps for a book: its characte
 | [`story-review-librarian`](agents/story-review-librarian.md) | Working document | Whether a writer, or Claude drafting, can find the one current answer: organisation, repeated facts, stale entries, canon marked off from notes. |
 | [`story-review-turing`](agents/story-review-turing.md) | Machine-patterned writing | Wording, constructions, punctuation, default names and stock details that make text read as AI-written. It reports patterns and makes no claim about who wrote the text. |
 
+To run several on one change at once, choosing the lenses the change calls for, use the `story-review-swarm` skill from [claude-skills](https://github.com/stimothy/claude-skills). Under that skill each reviewer also gets a shell, used only to save its report with the skill's script.
+
 More are on the way.
 
 ## Using an agent
