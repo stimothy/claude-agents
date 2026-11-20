@@ -61,6 +61,8 @@ Each reviewer looks at a code change through one lens and leaves the rest to the
 | [`code-review-minimalist`](agents/code-review-minimalist.md) | Simplicity | Needless abstraction, duplication, misplaced logic and dead code, each with the simpler version named. |
 | [`code-review-skeptic`](agents/code-review-skeptic.md) | Blind read | Reads only the diff, assumes it is wrong, and reports only serious problems, each with the one thing to check. |
 
+To run all seven on one change at once, use the `code-review-swarm` skill from [claude-skills](https://github.com/stimothy/claude-skills).
+
 ### For reviewing a novel's story bible and manuscript
 
 A story bible is the working reference a novelist keeps for a book: its characters, world and rules, timeline, places, plot outline and style notes. Each reviewer looks at the bible, the outline or the chapters through one lens and leaves the rest to the others. All are read-only and none rewrites the author's prose: they describe problems and leave the fixing to the author. They cannot run git, so name the files or paste the text. A story-bible review with no lens named goes to `story-review-archivist`, and a chapter review with no lens named goes to `story-review-stylist`; ask for the others by name or by what they check.
